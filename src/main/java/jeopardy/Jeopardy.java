@@ -5,6 +5,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /* import json library */
 import com.google.gson.*;
@@ -34,10 +37,16 @@ public class Jeopardy {
                 for (int i = 0; i < questionArray.size(); i++) {
                     JsonObject question = questionArray.get(i).getAsJsonObject();
                     int val = 0;
+                    String cat;
+                    String ans;
+                    String que;
                     try {
                         val = Integer.parseInt(question.get("value").getAsString().substring(1).replaceAll(",", ""));
                     }
                     catch (Exception e) { /* ignore it for now */ }
+                    cat = question.get("category").getAsString().replaceAll(",", "");
+                    ans = question.get("answer").getAsString().replaceAll(",", "");
+                    que = question.get("question").getAsString().replaceAll(",", "");
                     /* what else? */
 
                     qList.add(new Jeopardy(cat, que, val, ans)); /* change this */
@@ -65,6 +74,19 @@ public class Jeopardy {
 
     public int value() {
         return this.value;
+    }
+
+    public static <T> List<T> apply(List<Jeopardy> list, Function<Jeopardy, T> f) {
+        return list.stream().map(f).collect(Collectors.toList());
+
+
+
+        //List<T> returned = f.apply(list.stream().collect(toList(T)));
+    }
+
+    public static <T> List<Jeopardy> apply(List<Jeopardy> list, Predicate<Jeopardy> f) {
+        return list.stream().filter(f).collect(Collectors.toList());
+        //List<T> returned = f.apply(list.stream().collect(toList(T)));
     }
 
     /* implement the different apply methods.
